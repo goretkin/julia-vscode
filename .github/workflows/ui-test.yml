@@ -59,7 +59,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
-          name: ui-test-screenshots
+          name: ui-test-screenshots-${{ matrix }}
           path: ui-test-resources/screenshots/
           if-no-files-found: ignore
 
@@ -67,6 +67,6 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
-          name: ui-test-log
+          name: ui-test-log-${{ matrix }}
           path: ui-test-resources/test.log
           if-no-files-found: error
