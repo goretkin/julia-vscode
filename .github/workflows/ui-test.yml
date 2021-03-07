@@ -25,9 +25,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Remove package-lock.json windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: rm -Force package-lock.json
+
+      - name: Remove package-lock.json *nix
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
+        run: rm -f package-lock.json
+
       - name: Setup Dependencies
         run: |
-          rm -f package-lock.json
           npm install
           npm run ui-test-setup
           npm run compile
@@ -37,12 +44,16 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
 
-      - name: Run UI Tests
+      - name: Setup Headless
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get install xvfb
           export DISPLAY=:99.0
           Xvfb -ac :99 -screen 0 1920x1080x16 &
+          npm run ui-test
+
+      - name: Run UI Tests
+        run: |
           npm run ui-test
 
       - name: Archive UI Test screenshots
