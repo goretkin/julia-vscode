@@ -15,6 +15,6 @@ describe('My Test Suite', () => {
     // test whatever we want using webdriver, here we are just checking the page title
     it('My Test Case', async () => {
         const title = await driver.getTitle();
-        assert.include(title, 'Welcome');
+        assert.include(title, 'NotToBeFoundWelcome');
     });
 });
