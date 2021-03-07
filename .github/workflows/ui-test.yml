@@ -14,13 +14,8 @@ jobs:
       matrix:
         node-version: [14]
         julia-version: ['1.5']
-        include:
-          - os: ubuntu-latest
-            node-cache-path: "~/.npm"
-          - os: macOS-latest
-            node-cache-path: "~/.npm"
-          - os: windows-latest
-            node-cache-path: "%AppData%/npm-cache"
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
       fail-fast: false
 
     steps:
@@ -31,12 +26,26 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Cache node modules
+      - name: Cache node modules windows
+        if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
         with:
-          path: ${{ matrix.node-cache-path }}
+          path: "%AppData%/npm-cache"
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache node modules posix
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: "~/.npm"
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
@@ -63,7 +72,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: rm -Force package-lock.json
 
-      - name: Remove package-lock.json *nix
+      - name: Remove package-lock.json posix
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
         run: rm -f package-lock.json
 
