@@ -27,6 +27,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           rm -f package-lock.json
+          npm run install
           npm run ui-test-setup
           npm run compile
 
