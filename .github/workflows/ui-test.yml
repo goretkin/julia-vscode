@@ -59,7 +59,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
-          name: ui-test-screenshots-${{ matrix }}
+          name: ui-test-screenshots-${{ matrix.os }}-julia:${{ matrix.julia-version }}-node:${{ matrix.node-version }}
           path: ui-test-resources/screenshots/
           if-no-files-found: ignore
 
@@ -67,6 +67,6 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
-          name: ui-test-log-${{ matrix }}
+          name: ui-test-log-${{ matrix.os }}-julia:${{ matrix.julia-version }}-node:${{ matrix.node-version }}
           path: ui-test-resources/test.log
           if-no-files-found: error
