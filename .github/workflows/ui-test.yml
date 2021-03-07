@@ -14,7 +14,13 @@ jobs:
       matrix:
         node-version: [14]
         julia-version: ['1.5']
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            node-cache-path: "~/.npm"
+          - os: macOS-latest
+            node-cache-path: "~/.npm"
+          - os: windows-latest
+            node-cache-path: "%AppData%/npm-cache"
       fail-fast: false
 
     steps:
@@ -24,6 +30,34 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ${{ matrix.node-cache-path }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache ui-test-resources
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # vscode-extension-tester uses different names on different platforms, it seems.
+          path: |
+            ui-test-resources/chromedriver*
+            ui-test-resources/Visual*
+            ui-test-resources/VSCode*
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
 
       - name: Remove package-lock.json windows
         if: ${{ matrix.os == 'windows-latest' }}
