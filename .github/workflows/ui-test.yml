@@ -42,13 +42,15 @@ jobs:
           Xvfb -ac :99 -screen 0 1920x1080x16 &
           npm run ui-test
 
-      - name: Archive UI Test results
+      - name: Archive UI Test screenshots
         uses: actions/upload-artifact@v2
         with:
           name: ui-test-screenshots
           path: ui-test-resources/screenshots
           if-no-files-found: ignore
 
+      - name: Archive UI Test log
+        uses: actions/upload-artifact@v2
           name: ui-test-log
           path: ui-test-resources/test.log
           if-no-files-found: error
