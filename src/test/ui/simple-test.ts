@@ -10,11 +10,12 @@ describe('My Test Suite', () => {
     before(async () => {
         browser = VSBrowser.instance;
         driver = browser.driver;
+        browser.takeScreenshot("initialized");
     });
 
     // test whatever we want using webdriver, here we are just checking the page title
     it('My Test Case', async () => {
         const title = await driver.getTitle();
-        assert.include(title, 'NotToBeFoundWelcome');
+        assert.include(title, 'Welcome');
     });
 });
