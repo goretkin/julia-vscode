@@ -46,11 +46,12 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ui-test-screenshots
-          path: ui-test-resources/screenshots
+          path: ui-test-resources/screenshots/
           if-no-files-found: ignore
 
       - name: Archive UI Test log
         uses: actions/upload-artifact@v2
+        with:
           name: ui-test-log
           path: ui-test-resources/test.log
           if-no-files-found: error
