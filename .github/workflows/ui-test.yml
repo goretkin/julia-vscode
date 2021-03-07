@@ -44,6 +44,7 @@ jobs:
           npm run ui-test
 
       - name: Archive UI Test screenshots
+        if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
           name: ui-test-screenshots
@@ -51,6 +52,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Archive UI Test log
+        if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
           name: ui-test-log
