@@ -1,33 +1,40 @@
-import { expect } from 'chai'
-import { ActivityBar, QuickOpenBox, SideBarView, Workbench } from 'vscode-extension-tester'
+import { VSBrowser, Workbench } from 'vscode-extension-tester'
 
 export function extensionUIAssetsTest() {
     describe('Verify extension\'s base assets are available after installation', () => {
 
+        let browser: VSBrowser
         //let view: ViewControl
-        let sideBar: SideBarView
-        let quickBox: QuickOpenBox
+        //let sideBar: SideBarView
+        //let quickBox: QuickOpenBox
 
         before(async function () {
-            this.timeout(150000)
+            this.timeout(15000)
+            browser = VSBrowser.instance
+
+            browser.takeScreenshot('initialized')
+
             //view = new ActivityBar().getViewControl('Extensions')
             //sideBar = await view.openView()
             //quickBox = await new Workbench().openCommandPrompt()
             const workbench = new Workbench()
             await workbench.executeCommand('Julia Start REPL')
-            workbench.takeScreenshot('start-repl-1')
+            await browser.takeScreenshot('start-repl-1')
             await new Promise(r => setTimeout(r, 1000))
-            workbench.takeScreenshot('start-repl-2')
-            await new Promise(r => setTimeout(r, 1000))
-            workbench.takeScreenshot('start-repl-3')
+            await browser.takeScreenshot('start-repl-2')
+            await new Promise(r => setTimeout(r, 4000))
+            await browser.takeScreenshot('start-repl-3')
+            await new Promise(r => setTimeout(r, 4000))
+            await browser.takeScreenshot('start-repl-4')
             //await new Promise(r => setTimeout(r, 50000))
         })
 
+
         it('Command Palette prompt knows RSP commands', async function () {
             this.timeout(45000)
-            await verifyCommandPalette(quickBox)
+            //await verifyCommandPalette(quickBox)
         })
-
+        /*
         it('Remote Server Protocol UI extension is installed', async function () {
             this.timeout(8000)
             //const section = await sideBar.getContent().getSection('Installed') as ExtensionsViewSection
@@ -49,7 +56,7 @@ export function extensionUIAssetsTest() {
             this.timeout(8000)
             const explorerView = new ActivityBar().getViewControl('Explorer')
             expect(explorerView).not.undefined
-            /*
+
             const bar = await explorerView.openView()
             const content = bar.getContent()
             const sections = await content.getSections()
@@ -60,7 +67,7 @@ export function extensionUIAssetsTest() {
             const actionsButton = await section.getActions();
             expect(actionsButton.length).to.equal(1);
             expect(actionsButton[0].getLabel()).to.equal(AdaptersConstants.RSP_SERVER_ACTION_BUTTON);
-            */
+
         })
 
         after(async function () {
@@ -77,9 +84,11 @@ export function extensionUIAssetsTest() {
                 await quickBox.cancel()
             }
         })
+        */
     })
 }
 
+/*
 async function verifyCommandPalette(quick: QuickOpenBox) {
     if (!quick || ! await quick.isDisplayed()) {
         quick = await new Workbench().openCommandPrompt()
@@ -88,7 +97,7 @@ async function verifyCommandPalette(quick: QuickOpenBox) {
     const options = await quick.getQuickPicks()
     expect(await options[0].getText()).not.equal('No commands matching')
     expect(await options[0].getText()).not.equal('No results found')
-    /*
+
     for (const element of AdaptersConstants.RSP_MAIN_COMMANDS) {
         const expression = AdaptersConstants.RSP_COMMAND + ' ' + element;
         await quick.setText(`>${expression}`);
@@ -96,7 +105,8 @@ async function verifyCommandPalette(quick: QuickOpenBox) {
         const optionsString = await Promise.all(option.map(item => item.getText()));
         expect(optionsString).to.have.members([expression]);
     };
-    */
+
 }
+*/
 
 extensionUIAssetsTest()
