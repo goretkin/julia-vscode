@@ -76,11 +76,14 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
         run: rm -f package-lock.json
 
-      - name: Setup Dependencies
-        run: |
-          npm install
-          npm run ui-test-setup
-          npm run compile
+      - name: npm install
+        run: npm install
+
+      - name: npm run ui-test-setup
+        run: npm run ui-test-setup
+
+      - name: npm run compile
+        run: npm run compile
 
       - name: Setup julia
         uses: julia-actions/setup-julia@v1
