@@ -66,15 +66,19 @@ async function doit() {
     console.log('Launching tests...')
 
     // testing code here
-    //browser = VSBrowser.instance
 
+    const workbench = new Workbench()
     browser.takeScreenshot('initialized')
+    const notifications_center = await workbench.openNotificationsCenter()
+    await notifications_center.clearAllNotifications()
+    await browser.takeScreenshot('clear-notifications-1')
 
     //view = new ActivityBar().getViewControl('Extensions')
     //sideBar = await view.openView()
     //quickBox = await new Workbench().openCommandPrompt()
-    const workbench = new Workbench()
+
     await workbench.executeCommand('Julia Start REPL')
+
     await browser.takeScreenshot('start-repl-1')
     await new Promise(r => setTimeout(r, 1000))
     await browser.takeScreenshot('start-repl-2')
@@ -82,6 +86,9 @@ async function doit() {
     await browser.takeScreenshot('start-repl-3')
     await new Promise(r => setTimeout(r, 4000))
     await browser.takeScreenshot('start-repl-4')
+
+    await notifications_center.clearAllNotifications()
+    await browser.takeScreenshot('clear-notifications-2')
 
     // this__.mocha.suite.afterAll
     await browser.quit()
