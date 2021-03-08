@@ -66,10 +66,10 @@ async function doit() {
     console.log('Launching tests...')
 
     // testing code here
-
+    // TODO any exceptions here will leave the VSCode-under-test open, and not generate Selenium logs.
     const workbench = new Workbench()
     browser.takeScreenshot('initialized')
-    const notifications_center = await workbench.openNotificationsCenter()
+    let notifications_center = await workbench.openNotificationsCenter()
     await notifications_center.clearAllNotifications()
     await browser.takeScreenshot('clear-notifications-1')
 
@@ -87,6 +87,8 @@ async function doit() {
     await new Promise(r => setTimeout(r, 4000))
     await browser.takeScreenshot('start-repl-4')
 
+    // prevent `ElementNotVisibleError: element not interactable`
+    notifications_center = await workbench.openNotificationsCenter()
     await notifications_center.clearAllNotifications()
     await browser.takeScreenshot('clear-notifications-2')
 
