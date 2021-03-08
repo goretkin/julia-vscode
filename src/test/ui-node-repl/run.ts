@@ -37,7 +37,7 @@ async function doit() {
     await this_.checkCodeVersion(runOptions.vscodeVersion ?? DEFAULT_RUN_OPTIONS.vscodeVersion)
     const literalVersion = runOptions.vscodeVersion === undefined || runOptions.vscodeVersion === 'latest' ? this_.availableVersions[0] : runOptions.vscodeVersion
     console.log(`VSCode Version: ${literalVersion}`)
-    console.log(`VSCode executable: ${this_.executablePath}`)
+    console.log(`VSCode / Chrome executable: ${this_.executablePath}`)
 
     // add chromedriver to process' path
     const finalEnv: NodeJS.ProcessEnv = {}

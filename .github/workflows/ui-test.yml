@@ -101,7 +101,7 @@ jobs:
         run: |
           npm run ui-test
 
-      - name: Check extensions directory posix
+      - name: Check VSCode extensions directory posix
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
         run: ls -la ui-test-resources/dot-vscode/extensions/ || true
 
