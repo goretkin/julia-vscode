@@ -33,7 +33,7 @@
                 "${workspaceFolder}/out/test/**/*.js"
             ],
             "preLaunchTask": "npm: test-compile"
-        }
+        },
         {
             "name": "Debug UI Test",
             "type": "node",
