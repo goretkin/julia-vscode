@@ -101,6 +101,10 @@ jobs:
         run: |
           node ./out/src/test/ui-node-repl/run.js
 
+      - name: Check extensions directory posix
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
+        run: ls -la ui-test-resources/dot-vscode/extensions/ || true
+
       - name: Archive UI Test screenshots
         if: ${{ always() }}
         uses: actions/upload-artifact@v2

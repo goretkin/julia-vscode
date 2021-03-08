@@ -19,7 +19,8 @@ function codeStream(stream: string) {
 
 const vscode_release = codeStream(undefined)
 const storage_dir = './ui-test-resources'
-const extensions_dir = undefined
+// TODO use `vscode --extensionDevelopmentPath` instead of requiring the extension to be packaged and installed
+const extensions_dir = './ui-test-resources/dot-vscode/extensions'
 const extest = new ExTester(storage_dir, vscode_release, extensions_dir)
 const runOptions = { // `: RunOptions` , but that is not exported.
     vscodeVersion: undefined,

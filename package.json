@@ -960,8 +960,9 @@
         "package": "vsce package",
         "updatedeps": "npm run compile && node ./out/scripts/updateDeps.js",
         "ui-test": "npm run compile && npm run ui-test-setup && npm run ui-test-only",
-        "ui-test-only": "extest run-tests --storage ./ui-test-resources 'out/src/test/ui/*.js'",
-        "ui-test-setup": "extest get-vscode --storage ./ui-test-resources && extest get-chromedriver --storage ./ui-test-resources"
+        "ui-test-only": "extest run-tests --storage ./ui-test-resources --extensions_dir ./ui-test-resources/dot-vscode/extensions 'out/src/test/ui/*.js'",
+        "ui-test-package-and-install": "extest install-vsix --storage ./ui-test-resources --extensions_dir ./ui-test-resources/dot-vscode/extensions",
+        "ui-test-setup": "extest get-vscode --storage ./ui-test-resources && extest get-chromedriver --storage ./ui-test-resources && npm run ui-test-package-and-install"
     },
     "dependencies": {
         "@traptitech/markdown-it-katex": "^3.3.1",

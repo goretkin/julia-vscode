@@ -13,3 +13,4 @@ CONTRIBUTING.md
 azure-pipelines.yml
 README-insider.md
 projectmanagement
+ui-test-resources/**
