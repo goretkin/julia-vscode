@@ -34,5 +34,15 @@
             ],
             "preLaunchTask": "npm: test-compile"
         }
+        {
+            "name": "Debug UI Test",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/test/ui-node-repl/run.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ]
+        }
     ]
 }
