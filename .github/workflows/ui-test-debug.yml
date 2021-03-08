@@ -1,4 +1,5 @@
-name: UI Test CI
+# sync with `ui-test.yml` until DRY
+name: UI Test Debugging and Development
 
 on:
   push:

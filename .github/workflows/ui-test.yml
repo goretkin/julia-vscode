@@ -1,3 +1,4 @@
+# sync with `ui-test-debug.yml` until DRY
 name: UI Test CI
 
 on:
