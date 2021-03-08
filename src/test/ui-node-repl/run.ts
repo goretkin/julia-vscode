@@ -22,6 +22,7 @@ const testFiles = 'out/src/test/ui/*.js'
 const run_options = { // `: RunOptions` , but that is not exported.
     vscodeVersion: undefined,
     settings: undefined,
-}
+};
 
-extest.runTests(testFiles, run_options)
+// escape hatch to access private member
+(<any>extest).code.runTests(testFiles, run_options)
