@@ -100,7 +100,7 @@ async function doit() {
     await browser.takeScreenshot('start-repl-2')
     await new Promise(r => setTimeout(r, 4000))
     await browser.takeScreenshot('start-repl-3')
-    await new Promise(r => setTimeout(r, 4000))
+    await new Promise(r => setTimeout(r, 16000))
     await browser.takeScreenshot('start-repl-4')
 
     // prevent `ElementNotVisibleError: element not interactable`
