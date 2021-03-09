@@ -958,7 +958,11 @@
         "initialsetup": "npm i && git submodule init && git submodule update",
         "update2latest": "git pull && git submodule init && git submodule update && npm install --no-save && npm run compile && npm run webpack",
         "package": "vsce package",
-        "updatedeps": "npm run compile && node ./out/scripts/updateDeps.js"
+        "updatedeps": "npm run compile && node ./out/scripts/updateDeps.js",
+        "ui-test": "npm run compile && npm run ui-test-setup && npm run ui-test-only",
+        "ui-test-only": "extest run-tests --storage ./ui-test-resources --extensions_dir ./ui-test-resources/dot-vscode/extensions 'out/src/test/ui/*.js'",
+        "ui-test-package-and-install": "extest install-vsix --storage ./ui-test-resources --extensions_dir ./ui-test-resources/dot-vscode/extensions",
+        "ui-test-setup": "extest get-vscode --storage ./ui-test-resources && extest get-chromedriver --storage ./ui-test-resources && npm run ui-test-package-and-install"
     },
     "dependencies": {
         "@traptitech/markdown-it-katex": "^3.3.1",
@@ -980,6 +984,7 @@
         "which": "^2.0.2"
     },
     "devDependencies": {
+        "@types/chai": "^4.2.15",
         "@types/cson-parser": "^4.0.4",
         "@types/download": "^6.2.4",
         "@types/markdown-it": "^12.0.1",
@@ -987,14 +992,16 @@
         "@types/node": "^12.20.4",
         "@types/semver": "^7.3.4",
         "@typescript-eslint/parser": "^4.16.1",
+        "chai": "^4.3.3",
         "cson-parser": "^4.0.8",
         "download": "^8.0.0",
         "eslint": "^7.21.0",
-        "mocha": "^8.3.0",
+        "mocha": "^8.3.1",
         "semver": "^7.3.4",
         "ts-loader": "^8.0.17",
         "typescript": "^4.2.2",
         "vsce": "^1.85.1",
+        "vscode-extension-tester": "^4.0.1",
         "vscode-test": "^1.5.1",
         "webpack": "^4.46.0",
         "webpack-cli": "^3.3.12"

@@ -1,0 +1,124 @@
+# sync with `ui-test-debug.yml` until DRY
+name: UI Test CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        node-version: [14]
+        julia-version: ['1.5']
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache node modules windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: "%AppData%/npm-cache"
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache node modules posix
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: "~/.npm"
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache ui-test-resources
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # vscode-extension-tester uses different names on different platforms, it seems.
+          path: |
+            ui-test-resources/chromedriver*
+            ui-test-resources/Visual*
+            ui-test-resources/VSCode*
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Remove package-lock.json windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: rm -Force package-lock.json
+
+      - name: Remove package-lock.json posix
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
+        run: rm -f package-lock.json
+
+      - run: npm install
+
+      - run: npm run ui-test-setup
+
+      - run: npm run compile
+
+      - name: Setup julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+
+      - name: Run UI Tests Ubuntu
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get install xvfb
+          export DISPLAY=:99.0
+          Xvfb -ac :99 -screen 0 1920x1080x16 &
+          npm run ui-test
+
+      - name: Run UI Tests Windows / mac
+        if: ${{ matrix.os == 'macOS-latest' || matrix.os == 'windows-latest' }}
+        run: |
+          npm run ui-test
+
+      - name: Check VSCode extensions directory posix
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest' }}
+        run: ls -la ui-test-resources/dot-vscode/extensions/ || true
+
+      - name: Archive UI Test screenshots
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ui-test-screenshots-${{ matrix.os }}-julia_${{ matrix.julia-version }}-node_${{ matrix.node-version }}
+          path: ui-test-resources/screenshots/
+          if-no-files-found: ignore
+
+      - name: Archive UI Test log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ui-test-log-${{ matrix.os }}-julia_${{ matrix.julia-version }}-node_${{ matrix.node-version }}
+          path: ui-test-resources/test.log
+          if-no-files-found: error
