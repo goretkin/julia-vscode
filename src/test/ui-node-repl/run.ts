@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { ExTester, ReleaseQuality, VSBrowser, Workbench } from 'vscode-extension-tester'
+import { BottomBarPanel, ExTester, ReleaseQuality, StatusBar, VSBrowser, Workbench } from 'vscode-extension-tester'
 import { VSRunner } from 'vscode-extension-tester/out/suite/runner'
 import { DEFAULT_RUN_OPTIONS } from 'vscode-extension-tester/out/util/codeUtil'
 
@@ -30,12 +30,27 @@ const runOptions = { // `: RunOptions` , but that is not exported.
     logLevel: undefined
 }
 
+/*
+TODO all selenium interactions should catch
+`ElementNotVisibleError: element not interactable`
+and try again after doing e.g. this
+*/
+async function clear_notifications() {
+    //await new Promise(r => setTimeout(r, 500)) // hack.
+    const notifications_center = await new StatusBar().openNotificationsCenter()
+    // prevent `ElementNotVisibleError: element not interactable` while clearing
+    await notifications_center.clearAllNotifications()
+    await new StatusBar().closeNotificationsCenter()
+}
+
 async function doit() {
     // body of `CodeUtil.runTests` in `vscode-extension-tester/src/util/codeUtil.ts`
     const this_ = (<any>extest).code // escape hatch to access private member
 
     await this_.checkCodeVersion(runOptions.vscodeVersion ?? DEFAULT_RUN_OPTIONS.vscodeVersion)
     const literalVersion = runOptions.vscodeVersion === undefined || runOptions.vscodeVersion === 'latest' ? this_.availableVersions[0] : runOptions.vscodeVersion
+    const vsc_available_versions = this_.availableVersions
+    console.log({ vsc_available_versions })
     console.log(`VSCode Version: ${literalVersion}`)
     console.log(`VSCode / Chrome executable: ${this_.executablePath}`)
 
@@ -69,7 +84,7 @@ async function doit() {
     // TODO any exceptions here will leave the VSCode-under-test open, and not generate Selenium logs.
     const workbench = new Workbench()
     browser.takeScreenshot('initialized')
-    let notifications_center = await workbench.openNotificationsCenter()
+    const notifications_center = await workbench.openNotificationsCenter()
     await notifications_center.clearAllNotifications()
     await browser.takeScreenshot('clear-notifications-1')
 
@@ -77,7 +92,8 @@ async function doit() {
     //sideBar = await view.openView()
     //quickBox = await new Workbench().openCommandPrompt()
 
-    await workbench.executeCommand('Julia Start REPL')
+    await new Promise(r => setTimeout(r, 1000))
+    await workbench.executeCommand('Julia Start REPL') // TODO command should be found
 
     await browser.takeScreenshot('start-repl-1')
     await new Promise(r => setTimeout(r, 1000))
@@ -88,9 +104,40 @@ async function doit() {
     await browser.takeScreenshot('start-repl-4')
 
     // prevent `ElementNotVisibleError: element not interactable`
-    notifications_center = await workbench.openNotificationsCenter()
-    await notifications_center.clearAllNotifications()
+    await clear_notifications()
+
     await browser.takeScreenshot('clear-notifications-2')
+
+    // ---------- terminal -------
+    const bottom_panel = new BottomBarPanel()
+    let terminal = await bottom_panel.openTerminalView() // should already be opened
+    await clear_notifications()
+    const terminal_channel_names = await terminal.getChannelNames()
+    console.log({ terminal_channel_names })
+
+    await clear_notifications()
+    const terminal_channel_name = await terminal.getCurrentChannel()
+    console.log({ terminal_channel_name }) // should contain `Julia REPL`, but it is undefined?
+
+    await clear_notifications()
+    const terminal_contents = await terminal.getText()
+    console.log('\n\nContents of terminal: ')
+    console.log(terminal_contents)
+    console.log('\n\n------------\n\n')
+
+    const julia_prompt = terminal_contents.trim().endsWith('julia>')
+    console.log({ julia_prompt }) // should be true, consider blocking if e.g. precompiling
+
+    await clear_notifications()
+    // regain focus to avoid `WebDriverError: element not interactable`
+    // not sure, it's not working locally.
+    // `vscode-extension-tester/test/test-project/src/test/bottomBar/views-test.ts` skips
+    // darwin, so maybe this doesn't work well on macOS
+    terminal = await bottom_panel.openTerminalView()
+    await terminal.executeCommand('1 + 1')
+    const terminal_contents2 = (await terminal.getText()).trim()
+    //const new_terminal_contents2 = terminal_contents2.substring(terminal_contents.length) // faulty assumption that all previous text is still here
+    console.log({ terminal_contents2 })
 
     // this__.mocha.suite.afterAll
     await browser.quit()
